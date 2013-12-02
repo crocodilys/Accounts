@@ -1,5 +1,7 @@
 package by.bsu.famcs.tp4.logic;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import by.bsu.famcs.tp4.accounts.*;
 
@@ -8,10 +10,32 @@ public class Bank {
 	private static Bank instance; 
 	
 	private ArrayList<BaseAccount> accounts;
+	
+	private Timer timer;
+	
+	class PayInterestTask extends TimerTask
+	{
+		@Override
+		public void run() {
+			for (int i = 0; i < accounts.size(); i++)
+			{
+				if (accounts.get(i).getClass() == SavingAccount.class)
+				{
+					((SavingAccount)(accounts.get(i))).payInterest();
+				}
+				if (accounts.get(i).getClass() == OverdraftAccount.class)
+				{
+					((OverdraftAccount)(accounts.get(i))).payInterest();
+				}
+			}
+		}
+	}
 
 	private Bank()
 	{
 		accounts = new ArrayList<BaseAccount>();
+		timer = new Timer();
+		timer.schedule(new PayInterestTask(), 1, 1000);
 	}
 	
 	public static Bank getInstance()
